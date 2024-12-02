@@ -36,3 +36,8 @@ Stores keys, values, child pointers, and metadata about parent and current block
 - Numbers must be stored as 8-byte integers in big-endian format.
 - Only 3 nodes may be in memory at any time.
 - Error handling is required for all user inputs and file operations.
+
+
+# Start of project
+
+I'll first create a main file that will be running the program and it will display the menu.
