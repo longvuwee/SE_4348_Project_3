@@ -1,9 +1,3 @@
-from file_handler import create_index_file, open_index_file
-from btree import BTree
-
-current_file = None  # Tracks the currently open index file
-btree = None         # Instance of the BTree class
-
 def display_menu():
     print("\nMenu:")
     print("create  - Create a new index file")
@@ -21,19 +15,13 @@ def main():
         display_menu()
         choice = input("Enter your choice: ").strip().lower()
 
-        if choice == "1":
+        if choice == "create":
             filename = input("Enter the filename to create: ").strip()
-            if create_index_file(filename):
-                current_file = filename
-                btree = BTree()
 
-        elif choice == "2":
+        elif choice == "open":
             filename = input("Enter the filename to open: ").strip()
-            if open_index_file(filename):
-                current_file = filename
-                btree = BTree()
 
-        elif choice == "3":
+        elif choice == "insert":
             if not current_file:
                 print("No index file is open. Please create or open a file first.")
                 continue
@@ -45,7 +33,7 @@ def main():
             except ValueError:
                 print("Invalid input. Please enter integers only.")
 
-        elif choice == "4":
+        elif choice == "search":
             if not current_file:
                 print("No index file is open. Please create or open a file first.")
                 continue
@@ -59,12 +47,21 @@ def main():
             except ValueError:
                 print("Invalid input. Please enter an integer.")
 
+        elif choice == "load":
+            break
+
+        elif choice == "print":
+            break
+
+        elif choice == "extract":
+            break
+
         elif choice == "8":
             print("Exiting the program.")
             break
 
         else:
-            print("Option not implemented or invalid. Please try again.")
+            print("Option invalid. Please try again.")
 
 if __name__ == "__main__":
     main()
