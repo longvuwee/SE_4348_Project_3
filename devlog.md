@@ -44,3 +44,7 @@ I'll first create a main file that will be running the program and it will displ
 
 # 12-7-24 4:40PM
 
+make another python file called fileHandler to work with file handling. create 2 functions, one for creating a file and one for opening a file.
+
+
+for the file creation function, the header should use the <code>n.to_bytes(8, 'big')</code> to convert the integers into bytes as big endian

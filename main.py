@@ -1,3 +1,6 @@
+from fileHandler import create_index_file, open_index_file
+
+
 def display_menu():
     print("\nMenu:")
     print("create  - Create a new index file")
@@ -17,9 +20,13 @@ def main():
 
         if choice == "create":
             filename = input("Enter the filename to create: ").strip()
-
+            if create_index_file(filename):
+                current_file = filename
+                
         elif choice == "open":
             filename = input("Enter the filename to open: ").strip()
+            if open_index_file(filename):
+                current_file = filename
 
         elif choice == "insert":
             if not current_file:
