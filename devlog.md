@@ -55,3 +55,8 @@ for the file creation function, the header should use the <code>n.to_bytes(8, 'b
 work on BTree algorithm in another python file.
 
 create a class for the BTree nodes and a class for the BTree.
+added a insert, print, and search method
+
+# 12-8-24 12:40 AM
+
+added a load_from_file method and input.csv file to test the load option and check if the keys and values are inserted correctly to the BTree

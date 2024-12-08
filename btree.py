@@ -48,7 +48,8 @@ class BTree:
 
     def insert_into_leaf(self, node, key, value):
         if key in node.keys[:node.num_pairs]:
-            raise ValueError(f"Key {key} already exists in the B-Tree.")
+            print(f"Key {key} already exists in the B-Tree.")
+            return
         index = 0
         while index < node.num_pairs and node.keys[index] < key:
             index += 1
