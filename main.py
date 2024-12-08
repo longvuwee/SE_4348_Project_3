@@ -1,4 +1,6 @@
 from fileHandler import create_index_file, open_index_file
+from btree import BTree
+
 
 
 def display_menu():
@@ -14,6 +16,9 @@ def display_menu():
 
 def main():
     global current_file, btree
+    current_file = None
+    btree = None
+
     while True:
         display_menu()
         choice = input("Enter your choice: ").strip().lower()
@@ -22,11 +27,13 @@ def main():
             filename = input("Enter the filename to create: ").strip()
             if create_index_file(filename):
                 current_file = filename
-                
+                btree = BTree()
+
         elif choice == "open":
             filename = input("Enter the filename to open: ").strip()
             if open_index_file(filename):
                 current_file = filename
+                btree = BTree()
 
         elif choice == "insert":
             if not current_file:
@@ -55,20 +62,48 @@ def main():
                 print("Invalid input. Please enter an integer.")
 
         elif choice == "load":
-            break
+            if not filename:
+                print("No index file is open. Please create or open an index file first.")
+                continue
+            filename = input("Enter the filename to load from: ").strip()
+            try:
+                btree.load_from_file(filename)
+                print(f"Key-value pairs loaded from {filename}.")
+            except IOError as e:
+                print(f"Error loading from file: {e}")
 
         elif choice == "print":
-            break
+            if not btree:
+                print("No index file is open. Please create or open an index file first.")
+                continue
+            btree.print_tree()
 
         elif choice == "extract":
-            break
+            if not btree:
+                print("No index file is currently open. Please create or open an index file first.")
+                continue
+            filename = input("Enter filename to extract to: ").strip()
+            try:
+                try:
+                    with open(filename, 'rb'):
+                        overwrite = input("File exists. Overwrite? (y/n): ").strip().lower()
+                        if overwrite != 'y':
+                            print("Extraction canceled.")
+                            continue
+                except FileNotFoundError:
+                    pass
 
-        elif choice == "8":
+                btree.extract_to_file(filename)
+                print(f"Key-value pairs extracted to {filename}.")
+            except IOError as e:
+                print(f"Error extracting to file: {e}")
+
+        elif choice == "quit":
             print("Exiting the program.")
             break
-
         else:
             print("Option invalid. Please try again.")
 
+    exit()
 if __name__ == "__main__":
     main()

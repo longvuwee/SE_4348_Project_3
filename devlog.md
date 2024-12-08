@@ -48,3 +48,10 @@ make another python file called fileHandler to work with file handling. create 2
 
 
 for the file creation function, the header should use the <code>n.to_bytes(8, 'big')</code> to convert the integers into bytes as big endian
+
+
+# 12-7-24 7:30 PM
+
+work on BTree algorithm in another python file.
+
+create a class for the BTree nodes and a class for the BTree.
