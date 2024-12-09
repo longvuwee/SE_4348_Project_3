@@ -1,8 +1,6 @@
 from fileHandler import create_index_file, open_index_file
 from btree import BTree
 
-
-
 def display_menu():
     print("\nMenu:")
     print("create  - Create a new index file")
@@ -28,22 +26,24 @@ def main():
             if create_index_file(filename):
                 current_file = filename
                 btree = BTree()
+                btree.set_current_file(current_file)  # Set the current file for the BTree
 
         elif choice == "open":
             filename = input("Enter the filename to open: ").strip()
             if open_index_file(filename):
                 current_file = filename
                 btree = BTree()
+                btree.set_current_file(current_file)
+                btree.read_from_idx_file(current_file)
 
         elif choice == "insert":
             if not current_file:
                 print("No index file is open. Please create or open a file first.")
                 continue
             try:
-                key = int(input("Enter the key (unsigned integer): ").strip())
-                value = int(input("Enter the value (unsigned integer): ").strip())
+                key = int(input("Enter the key: ").strip())
+                value = int(input("Enter the value: ").strip())
                 btree.insert(key, value)
-                print("Key-value pair inserted.")
             except ValueError:
                 print("Invalid input. Please enter integers only.")
 
@@ -62,13 +62,13 @@ def main():
                 print("Invalid input. Please enter an integer.")
 
         elif choice == "load":
-            if not filename:
+            if not current_file:
                 print("No index file is open. Please create or open an index file first.")
                 continue
-            filename = input("Enter the filename to load from: ").strip()
+            filename = input("Enter the filename to load keys and values from: ").strip()
             try:
-                btree.load_from_file(filename)
                 print(f"Key-value pairs loaded from {filename}.")
+                btree.load_from_file(filename)
             except IOError as e:
                 print(f"Error loading from file: {e}")
 
@@ -80,19 +80,10 @@ def main():
 
         elif choice == "extract":
             if not btree:
-                print("No index file is currently open. Please create or open an index file first.")
+                print("No index file is open. Please create or open an index file first.")
                 continue
-            filename = input("Enter filename to extract to: ").strip()
+            filename = input("Enter the filename: ").strip()
             try:
-                try:
-                    with open(filename, 'rb'):
-                        overwrite = input("File exists. Overwrite? (y/n): ").strip().lower()
-                        if overwrite != 'y':
-                            print("Extraction canceled.")
-                            continue
-                except FileNotFoundError:
-                    pass
-
                 btree.extract_to_file(filename)
                 print(f"Key-value pairs extracted to {filename}.")
             except IOError as e:

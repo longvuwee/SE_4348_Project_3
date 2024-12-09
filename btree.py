@@ -10,11 +10,30 @@ class BTreeNode:
     def is_full(self):
         return self.num_pairs == 19
 
+    def to_bytes(self):
+        data = self.block_id.to_bytes(8, 'big')
+        data += self.parent_id.to_bytes(8, 'big')
+        data += self.num_pairs.to_bytes(8, 'big')
+
+        for key in self.keys:
+            data += key.to_bytes(8, 'big')
+
+        for value in self.values:
+            data += value.to_bytes(8, 'big')
+
+        for child in self.children:
+            data += child.to_bytes(8, 'big')
+        return data
+
 class BTree:
     def __init__(self, degree=10):
         self.degree = degree
         self.root = BTreeNode(1)
         self.nodes = {1: self.root}
+        self.current_file = None  # Store current file path
+
+    def set_current_file(self, filename):
+        self.current_file = filename
 
     def insert(self, key, value):
         node = self.root
@@ -25,6 +44,8 @@ class BTree:
                 continue
             if node.children[0] == 0:  # Leaf node
                 self.insert_into_leaf(node, key, value)
+                self.write_to_idx_file()
+                print("Key-value pair inserted.")
                 break
             for i in range(node.num_pairs):
                 if key < node.keys[i]:
@@ -58,6 +79,7 @@ class BTree:
         node.num_pairs += 1
         node.keys = node.keys[:19]
         node.values = node.values[:19]
+        print(f"Inserted '{value}' at key '{key}'")
 
     def split_node(self, node):
         mid_index = len(node.keys) // 2
@@ -91,7 +113,69 @@ class BTree:
             print(f"Node {node_id}:")
             for i in range(node.num_pairs):
                 print(f"  Key: {node.keys[i]}, Value: {node.values[i]}")
-        print("\n")
+
+    def read_from_idx_file(self, filename):
+        try:
+            with open(filename, 'rb') as file:
+                # Skip the header (512 bytes)
+                file.seek(512)
+                
+                # Clear current nodes to avoid conflicts
+                self.nodes = {}
+
+                while True:
+                    # Read one node (512 bytes per node)
+                    node_data = file.read(512)
+                    if not node_data:
+                        break  # End of file
+
+                    # Deserialize the node
+                    block_id = int.from_bytes(node_data[0:8], 'big')
+                    parent_id = int.from_bytes(node_data[8:16], 'big')
+                    num_pairs = int.from_bytes(node_data[16:24], 'big')
+
+                    # Extract keys, values, and child pointers
+                    keys = [
+                        int.from_bytes(node_data[24 + i * 8:32 + i * 8], 'big')
+                        for i in range(19)
+                    ]
+                    values = [
+                        int.from_bytes(node_data[176 + i * 8:184 + i * 8], 'big')
+                        for i in range(19)
+                    ]
+                    children = [
+                        int.from_bytes(node_data[328 + i * 8:336 + i * 8], 'big')
+                        for i in range(20)
+                    ]
+
+                    # Recreate the node and add it to the tree
+                    node = BTreeNode(block_id, parent_id)
+                    node.num_pairs = num_pairs
+                    node.keys = keys
+                    node.values = values
+                    node.children = children
+                    self.nodes[block_id] = node
+
+                # Set the root node based on the node with parent_id == 0
+                self.root = next(node for node in self.nodes.values() if node.parent_id == 0)
+                print("B-Tree loaded successfully from .idx file.")
+        except FileNotFoundError:
+            print(f"File '{filename}' not found.")
+        except Exception as e:
+            print(f"An error occurred while reading the .idx file: {e}")
+
+    def write_to_idx_file(self):
+        if not self.current_file:
+            print("No file is set. Cannot write to file.")
+            return
+        try:
+            HEADER_SIZE = 512  # Ensure we do not overwrite the header
+            with open(self.current_file, 'r+b') as file:  # Open in read+binary mode
+                file.seek(HEADER_SIZE)  # Move the file pointer past the header
+                for node in self.nodes.values():
+                    file.write(node.to_bytes())  # Write the node as bytes
+        except IOError as e:
+            print(f"Error writing to .idx file: {e}")
 
     def load_from_file(self, filename):
         try:
@@ -102,11 +186,10 @@ class BTree:
                         self.insert(key, value)
                     except ValueError:
                         print(f"Skipping invalid line: {line.strip()}")
-            print(f"Data loaded successfully from {filename}.")
         except FileNotFoundError:
-            print(f"Error: File '{filename}' not found.")
-        except IOError as e:
-            print(f"Error reading file '{filename}': {e}")
+            print(f"File {filename} not found.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
     def extract_to_file(self, filename):
         try:

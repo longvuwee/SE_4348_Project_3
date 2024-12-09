@@ -60,3 +60,9 @@ added a insert, print, and search method
 # 12-8-24 12:40 AM
 
 added a load_from_file method and input.csv file to test the load option and check if the keys and values are inserted correctly to the BTree
+
+# 12-8-24 9:20 PM
+
+fixed reading and writing to the current index file by writing all the keys and values into the .idx as a byte instead of a integer.
+
+reading from the file, I did the same thing but read it as a byte and convert it to an int
