@@ -46,9 +46,7 @@ I'll first create a main file that will be running the program and it will displ
 
 make another python file called fileHandler to work with file handling. create 2 functions, one for creating a file and one for opening a file.
 
-
 for the file creation function, the header should use the <code>n.to_bytes(8, 'big')</code> to convert the integers into bytes as big endian
-
 
 # 12-7-24 7:30 PM
 
@@ -61,8 +59,12 @@ added a insert, print, and search method
 
 added a load_from_file method and input.csv file to test the load option and check if the keys and values are inserted correctly to the BTree
 
-# 12-8-24 9:20 PM
+implented the extract option to read from a `.csv` file similar to what was said during the lecture overview for the project
+# 12-8-24 7:20 PM
 
 fixed reading and writing to the current index file by writing all the keys and values into the .idx as a byte instead of a integer.
 
-reading from the file, I did the same thing but read it as a byte and convert it to an int
+added `to_bytes` method for the `class BTreeNode` to convert the data when writing to the `.idx` file
+
+reading from the file, I did the same thing but read it as a byte and convert it to an int.
+
